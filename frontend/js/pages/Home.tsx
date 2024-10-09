@@ -11,6 +11,12 @@ const Home = () => {
   const [showContent, setShowContent] = useState(false); // State to toggle page display
 
   useEffect(() => {
+    const savedUsername = localStorage.getItem("username");
+    if (savedUsername) {
+      setUsername(savedUsername);
+      setShowContent(true);
+    }
+
     async function onFetchRestCheck() {
       setRestCheck(await RestService.restRestCheckRetrieve());
     }
@@ -28,8 +34,15 @@ const Home = () => {
   ) => {
     const trimmedUsername = username.trim();
     if (event.key === "Enter" && trimmedUsername !== "") {
+      localStorage.setItem("username", trimmedUsername);
       setShowContent(true); // Show the rest of the page
     }
+  };
+
+  const deleteUsername = () => {
+    localStorage.removeItem("username");
+    setUsername("");
+    setShowContent(false);
   };
 
   // Handle input change for channel
@@ -94,7 +107,7 @@ const Home = () => {
             type="text"
             value={username}
             onChange={handleUsernameChange}
-            onKeyDown={handleUsernameKeyDown} // Trigger on Enter key press
+            onKeyDown={handleUsernameKeyDown}
           />
         </div>
       ) : (
@@ -106,17 +119,32 @@ const Home = () => {
           )}
           <div id="django-background">Create your own channel:</div>
 
-          {/* Second input for entering a channel */}
           <div>
             <input
               placeholder="Enter channel name"
               style={{ margin: "10px 0", padding: "8px", width: "300px" }}
               type="text"
               value={channel}
-              onChange={handleChannelChange} // Handle channel input change
-              onKeyDown={handleChannelKeyDown} // Trigger on Enter key press
+              onChange={handleChannelChange}
+              onKeyDown={handleChannelKeyDown}
             />
-            <p>You entered: {channel}</p> {/* Display entered channel */}
+            <p>You entered: {channel}</p>
+            <button
+              style={{
+                padding: "10px 20px",
+                fontSize: "14px",
+                backgroundColor: "transparent",
+                border: "1px solid #ccc",
+                borderRadius: "10px",
+                cursor: "pointer",
+                color: "#333",
+                transition: "all 0.2s",
+              }}
+              type="button"
+              onClick={deleteUsername}
+            >
+              change current name: {username}
+            </button>
           </div>
         </div>
       )}
