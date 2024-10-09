@@ -4,6 +4,158 @@ info:
   version: 0.1.0
   description: A Django project boilerplate with Vinta's best practices
 paths:
+  /api/chatroom/:
+    get:
+      operationId: chatroom_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - chatroom
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedChatRoomSeralizerList'
+          description: ''
+    post:
+      operationId: chatroom_create
+      tags:
+      - chatroom
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRoomSeralizer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChatRoomSeralizer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChatRoomSeralizer'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRoomSeralizer'
+          description: ''
+  /api/chatroom/{id}/:
+    get:
+      operationId: chatroom_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chat room.
+        required: true
+      tags:
+      - chatroom
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRoomSeralizer'
+          description: ''
+    put:
+      operationId: chatroom_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chat room.
+        required: true
+      tags:
+      - chatroom
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRoomSeralizer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChatRoomSeralizer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChatRoomSeralizer'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRoomSeralizer'
+          description: ''
+    patch:
+      operationId: chatroom_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chat room.
+        required: true
+      tags:
+      - chatroom
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRoomSeralizer'
+          description: ''
+    delete:
+      operationId: chatroom_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this chat room.
+        required: true
+      tags:
+      - chatroom
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/rest/rest-check/:
     get:
       operationId: rest_rest_check_retrieve
@@ -181,13 +333,57 @@ paths:
           description: No response body
 components:
   schemas:
+    ChatRoomSeralizer:
+      type: object
+      properties:
+        room_name:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_count:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - created_at
+      - room_name
     Message:
       type: object
       properties:
         message:
           type: string
+        image:
+          type: string
+          format: uri
       required:
+      - image
       - message
+    PaginatedChatRoomSeralizerList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatRoomSeralizer'
     PaginatedUserList:
       type: object
       required:
@@ -211,6 +407,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
+    PatchedChatRoomSeralizer:
+      type: object
+      properties:
+        room_name:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_count:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
     PatchedUser:
       type: object
       properties:

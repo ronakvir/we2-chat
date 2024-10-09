@@ -6,8 +6,12 @@ export const $Message = {
     message: {
       type: "string",
     },
+    image: {
+      type: "string",
+      format: "uri",
+    },
   },
-  required: ["message"],
+  required: ["image", "message"],
 } as const;
 
 export const $PaginatedUserList = {

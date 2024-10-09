@@ -2,7 +2,7 @@
 
 export type Message = {
   message: string;
-  image?: string|null;
+  image: string;
 };
 
 export type PaginatedUserList = {
