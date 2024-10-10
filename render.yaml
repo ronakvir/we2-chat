@@ -1,8 +1,8 @@
 databases:
-  - name: iRemind-postgres
+  - name: we2-postgres
     databaseName: iRemind
     plan: free
-    user: iRemind
+    user: we2
 
 services:
   - type: redis
