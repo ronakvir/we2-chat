@@ -191,7 +191,7 @@ export class ChatroomsService {
   }
 
   /**
-   * @returns ChatRoomSeralizer
+   * @returns TopChatsResponse
    * @throws ApiError
    */
   public static chatroomsTop5Retrieve(): CancelablePromise<ChatroomsTop5RetrieveResponse> {

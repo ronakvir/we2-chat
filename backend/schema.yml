@@ -229,7 +229,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatRoomSeralizer'
+                $ref: '#/components/schemas/TopChatsResponse'
           description: ''
   /api/events/create/:
     post:
@@ -599,6 +599,15 @@ components:
           type: string
           format: date-time
           nullable: true
+    TopChatsResponse:
+      type: object
+      properties:
+        top_chats:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatRoomSeralizer'
+      required:
+      - top_chats
     User:
       type: object
       properties:

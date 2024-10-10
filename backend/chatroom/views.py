@@ -5,7 +5,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import ChatRoom, Events
-from .serializers import ChatRoomSeralizer, CreateChatRoomSerializer, EventsSerializer
+from .serializers import (
+    ChatRoomSeralizer,
+    CreateChatRoomSerializer,
+    EventsSerializer,
+    TopChatsResponseSerializer,
+)
 
 
 class ChatRoomViewSet(viewsets.ModelViewSet):
@@ -148,7 +153,7 @@ class CreateEvent(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class Top5ActiveChatsCount(APIView):
-    serializer_class = ChatRoomSeralizer
+    serializer_class = TopChatsResponseSerializer
 
     def get(self, request):
         top_chats = ChatRoom.objects.distinct().order_by('-user_count')[:5]

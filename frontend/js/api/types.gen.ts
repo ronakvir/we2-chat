@@ -64,6 +64,10 @@ export type PatchedUser = {
   last_login?: string | null;
 };
 
+export type TopChatsResponse = {
+  top_chats: Array<ChatRoomSeralizer>;
+};
+
 export type User = {
   readonly id: number;
   email: string;
@@ -153,7 +157,7 @@ export type ChatroomsLeaveCreateData = {
 
 export type ChatroomsLeaveCreateResponse = CreateChatRoom;
 
-export type ChatroomsTop5RetrieveResponse = ChatRoomSeralizer;
+export type ChatroomsTop5RetrieveResponse = TopChatsResponse;
 
 export type EventsCreateCreateData = {
   requestBody: Events;
@@ -283,7 +287,7 @@ export type $OpenApiTs = {
   "/api/chatrooms/top5/": {
     get: {
       res: {
-        200: ChatRoomSeralizer;
+        200: TopChatsResponse;
       };
     };
   };

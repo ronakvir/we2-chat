@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import iRemindlogo from "../../assets/images/we2logo.png";
-import { RestService, ChatroomsService } from "../api";
+import { ChatroomsService } from "../api";
 
 type ChatRoom = {
   id: number;
@@ -12,14 +12,11 @@ type ChatRoom = {
 };
 
 const Home = () => {
-  const [restCheck, setRestCheck] = useState<
-    Awaited<ReturnType<typeof RestService.restRestCheckRetrieve>> | undefined
-  >(undefined);
   const [topChats, setTopChats] = useState<ChatRoom[]>([]);
-  const [username, setUsername] = useState(""); // State for username input
-  const [channel, setChannel] = useState(""); // State for channel input
-  const [showContent, setShowContent] = useState(false); // State to toggle page display
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  const [username, setUsername] = useState("");
+  const [channel, setChannel] = useState("");
+  const [showContent, setShowContent] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,19 +27,16 @@ const Home = () => {
     }
 
     async function onFetchRestCheck() {
-      setRestCheck(await RestService.restRestCheckRetrieve());
       const topChatsData = await ChatroomsService.chatroomsTop5Retrieve();
       setTopChats(topChatsData.top_chats || []);
     }
     onFetchRestCheck();
   }, []);
 
-  // Open modal
   const openModal = () => {
     setIsModalOpen(true);
   };
 
-  // Close modal
   const closeModal = () => {
     setIsModalOpen(false);
   };
@@ -51,12 +45,10 @@ const Home = () => {
     navigate(`/chat/?channel=${roomName}`);
   };
 
-  // Handle input change for username
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
   };
 
-  // Handle key down for username input (on "Enter" key press)
   const handleUsernameKeyDown = (
     event: React.KeyboardEvent<HTMLInputElement>,
   ) => {
@@ -109,7 +101,6 @@ const Home = () => {
         </button>
       </div>
 
-      {/* Show username input initially, then show rest of the page */}
       {!showContent ? (
         <div
           style={{

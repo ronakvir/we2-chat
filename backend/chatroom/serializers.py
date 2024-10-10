@@ -24,3 +24,6 @@ class EventsSerializer(serializers.ModelSerializer):
         model = Events
         fields = ["event_name", "expires_at", "chat_room", "is_active"]  # noqa: RUF012
         read_only_fields = ['chat_room', 'is_active'] # noqa: RUF012
+
+class TopChatsResponseSerializer(serializers.Serializer):
+    top_chats = ChatRoomSeralizer(many=True)

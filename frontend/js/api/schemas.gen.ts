@@ -201,6 +201,19 @@ export const $PatchedUser = {
   },
 } as const;
 
+export const $TopChatsResponse = {
+  type: "object",
+  properties: {
+    top_chats: {
+      type: "array",
+      items: {
+        $ref: "#/components/schemas/ChatRoomSeralizer",
+      },
+    },
+  },
+  required: ["top_chats"],
+} as const;
+
 export const $User = {
   type: "object",
   properties: {
