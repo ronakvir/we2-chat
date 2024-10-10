@@ -9,7 +9,6 @@ export type ChatRoomSeralizer = {
 
 export type CreateChatRoom = {
   room_name: string;
-  readonly user_count: number;
 };
 
 export type Events = {

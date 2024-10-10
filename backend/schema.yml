@@ -453,12 +453,8 @@ components:
         room_name:
           type: string
           maxLength: 255
-        user_count:
-          type: integer
-          readOnly: true
       required:
       - room_name
-      - user_count
     Events:
       type: object
       properties:

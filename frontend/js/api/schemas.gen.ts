@@ -32,12 +32,8 @@ export const $CreateChatRoom = {
       type: "string",
       maxLength: 255,
     },
-    user_count: {
-      type: "integer",
-      readOnly: true,
-    },
   },
-  required: ["room_name", "user_count"],
+  required: ["room_name"],
 } as const;
 
 export const $Events = {
