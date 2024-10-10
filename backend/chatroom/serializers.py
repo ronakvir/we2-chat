@@ -16,7 +16,7 @@ class ChatRoomSeralizer(serializers.ModelSerializer):
 class CreateChatRoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatRoom
-        fields = ["room_name", "user_count"]  # noqa: RUF012
+        fields = ["room_name"]  # noqa: RUF012
         read_only_fields = ['user_count']  # noqa: RUF012
 
 class EventsSerializer(serializers.ModelSerializer):

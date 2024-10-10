@@ -5,8 +5,8 @@ import django_js_reverse.views
 from chatroom.routes import routes as chatroom_routes
 from chatroom.views import (
     CreateChatRoomOrIncrementUserCount,
+    CreateEvent,
     DecrementUserCountOrDeleteChatRoom,
-    CreateEvent
 )
 from common.routes import routes as common_routes
 from drf_spectacular.views import (

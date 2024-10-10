@@ -9,7 +9,6 @@ import {
   ChatroomsService,
 } from "../api";
 
-
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
