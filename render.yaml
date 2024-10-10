@@ -6,7 +6,7 @@ databases:
 
 services:
   - type: redis
-    name: iRemind-redis
+    name: we2-redis
     plan: free
     ipAllowList: [] # only allow internal connections
 
