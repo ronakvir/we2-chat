@@ -1,6 +1,6 @@
 databases:
   - name: we2-postgres
-    databaseName: iRemind
+    databaseName: we2
     plan: free
     user: we2
 
