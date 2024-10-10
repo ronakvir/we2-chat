@@ -156,6 +156,108 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/chatrooms/decrement/:
+    patch:
+      operationId: chatrooms_decrement_partial_update
+      tags:
+      - chatrooms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRoomSeralizer'
+          description: ''
+  /api/chatrooms/increment/:
+    patch:
+      operationId: chatrooms_increment_partial_update
+      tags:
+      - chatrooms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRoomSeralizer'
+          description: ''
+  /api/chatrooms/join/:
+    post:
+      operationId: chatrooms_join_create
+      tags:
+      - chatrooms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChatRoom'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateChatRoom'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateChatRoom'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChatRoom'
+          description: ''
+  /api/chatrooms/leave/:
+    post:
+      operationId: chatrooms_leave_create
+      tags:
+      - chatrooms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChatRoom'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateChatRoom'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateChatRoom'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateChatRoom'
+          description: ''
   /api/rest/rest-check/:
     get:
       operationId: rest_rest_check_retrieve
@@ -336,6 +438,9 @@ components:
     ChatRoomSeralizer:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         room_name:
           type: string
           maxLength: 255
@@ -349,6 +454,15 @@ components:
           minimum: -2147483648
       required:
       - created_at
+      - id
+      - room_name
+    CreateChatRoom:
+      type: object
+      properties:
+        room_name:
+          type: string
+          maxLength: 255
+      required:
       - room_name
     Message:
       type: object
@@ -410,6 +524,9 @@ components:
     PatchedChatRoomSeralizer:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         room_name:
           type: string
           maxLength: 255

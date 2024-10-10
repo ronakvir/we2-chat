@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { useLocation } from "react-router-dom";
 
 import iRemindlogo from "../../assets/images/we2logo.png";
+import {
+  ChatroomsJoinCreateResponse,
+  ChatroomsLeaveCreateResponse,
+  ChatroomsService,
+} from "../api";
 
 const handleLogoKeyPress = (event: { key: string }) => {
   if (event.key === "Enter" || event.key === " ") {
@@ -8,10 +15,16 @@ const handleLogoKeyPress = (event: { key: string }) => {
   }
 };
 
+const useQuery = () => {
+  return new URLSearchParams(useLocation().search);
+};
+
 const Chat = () => {
-  const [message, setMessage] = useState(""); // State to store the message
-  const [messages, setMessages] = useState<string[]>([]); // Store all sent messages
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<string[]>([]);
   const [username, setUsername] = useState("");
+  const query = useQuery();
+  const roomName = query.get("channel") || "";
 
   useEffect(() => {
     const savedUsername = localStorage.getItem("username");
@@ -20,22 +33,54 @@ const Chat = () => {
     } else {
       window.location.href = `http://localhost:8000/`;
     }
-  }, []);
+    const handleJoinOrCreateChatroom = async () => {
+      try {
+        const joinCreate: ChatroomsJoinCreateResponse =
+          await ChatroomsService.chatroomsJoinCreate({
+            // eslint-disable-next-line camelcase
+            requestBody: { room_name: roomName },
+          });
+        console.log("Successfully joined or created chatroom:", joinCreate);
+      } catch (error) {
+        console.error("Error joining or creating chatroom:", error);
+        window.location.href = `http://localhost:8000/`;
+      }
+    };
 
-  // Handle input change
+    const handleLeaveChatroom = async () => {
+      try {
+        const leaveResponse: ChatroomsLeaveCreateResponse =
+          await ChatroomsService.chatroomsLeaveCreate({
+            // eslint-disable-next-line camelcase
+            requestBody: { room_name: roomName },
+          });
+        console.log("Successfully left chatroom:", leaveResponse);
+      } catch (error) {
+        console.error("Error leaving chatroom:", error);
+      }
+    };
+
+    handleJoinOrCreateChatroom();
+
+    window.addEventListener("beforeunload", handleLeaveChatroom);
+
+    return () => {
+      handleLeaveChatroom();
+      window.removeEventListener("beforeunload", handleLeaveChatroom);
+    };
+  }, [roomName]);
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(event.target.value);
   };
 
-  // Handle sending a message
   const handleSendMessage = () => {
     if (message.trim()) {
-      setMessages([...messages, message]); // Add the message to the list of messages
-      setMessage(""); // Clear the input
+      setMessages([...messages, message]);
+      setMessage("");
     }
   };
 
-  // Handle "Enter" key press to send a message
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       handleSendMessage();
@@ -81,7 +126,7 @@ const Chat = () => {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          width: "400px", // Slim width
+          width: "400px",
           maxHeight: "70vh",
           borderRadius: "15px",
           border: "1px solid #e0e0e0",
@@ -89,7 +134,6 @@ const Chat = () => {
           overflow: "hidden",
         }}
       >
-        {/* Display messages */}
         <div
           style={{
             flex: 1,
@@ -114,8 +158,7 @@ const Chat = () => {
           ))}
         </div>
 
-        {/* Message input and send button */}
-        <div
+         <div
           style={{
             display: "flex",
             padding: "10px",
@@ -137,7 +180,7 @@ const Chat = () => {
             type="text"
             value={message}
             onChange={handleInputChange}
-            onKeyDown={handleKeyDown} // Send message on Enter key press
+            onKeyDown={handleKeyDown}
           />
           <button
             style={{
