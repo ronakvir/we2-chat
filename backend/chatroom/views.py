@@ -9,8 +9,8 @@ from .serializers import (
     ChatRoomSeralizer,
     CreateChatRoomSerializer,
     EventsSerializer,
-    MessagesListSerializer,
     MessagesCreateSerializer,
+    MessagesListSerializer,
     TopChatsResponseSerializer,
 )
 

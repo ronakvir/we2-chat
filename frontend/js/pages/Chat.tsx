@@ -1,5 +1,6 @@
+/* eslint-disable camelcase */
+import axios from "axios";
 import React, { useState, useEffect } from "react";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { useLocation, useNavigate } from "react-router-dom";
 
 import iRemindlogo from "../../assets/images/we2logo.png";
@@ -7,6 +8,8 @@ import {
   ChatroomsJoinCreateResponse,
   ChatroomsLeaveCreateResponse,
   ChatroomsService,
+  MessagesService,
+  MessagesList,
 } from "../api";
 
 const useQuery = () => {
@@ -15,7 +18,9 @@ const useQuery = () => {
 
 const Chat = () => {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<
+    { user_name: string; message: string }[]
+  >([]);
   const [username, setUsername] = useState("");
   const query = useQuery();
   const roomName = query.get("channel") || "";
@@ -46,7 +51,6 @@ const Chat = () => {
       try {
         const leaveResponse: ChatroomsLeaveCreateResponse =
           await ChatroomsService.chatroomsLeaveCreate({
-            // eslint-disable-next-line camelcase
             requestBody: { room_name: roomName },
           });
         console.log("Successfully left chatroom:", leaveResponse);
@@ -54,13 +58,36 @@ const Chat = () => {
         console.error("Error leaving chatroom:", error);
       }
     };
-
     handleJoinOrCreateChatroom();
 
+    const handleGetMessageRequest = async () => {
+      try {
+        const urlWithParams = `/api/messages/get/?room_name=${encodeURIComponent(roomName)}`;
+        const response = await axios.get(urlWithParams);
+
+        const { messages } = response.data;
+
+        setMessages(
+          messages.reverse().map((msg: MessagesList) => ({
+            user_name: msg.user_name,
+            message: msg.message,
+          })),
+        );
+      } catch (error) {
+        console.error("Error getting messages:", error);
+      }
+    };
+
+    handleGetMessageRequest();
+
+    const pollingInterval = setInterval(() => {
+      handleGetMessageRequest();
+    }, 5000);
     window.addEventListener("beforeunload", handleLeaveChatroom);
 
     return () => {
       handleLeaveChatroom();
+      clearInterval(pollingInterval);
       window.removeEventListener("beforeunload", handleLeaveChatroom);
     };
   }, [roomName]);
@@ -69,10 +96,25 @@ const Chat = () => {
     setMessage(event.target.value);
   };
 
+  const handleSendMessageRequest = async (message: string) => {
+    try {
+      await MessagesService.messagesCreateCreate({
+        requestBody: {
+          room_name: roomName,
+          user_name: username,
+          message,
+        },
+      });
+      setMessages([...messages, { user_name: username, message }]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
   const handleSendMessage = () => {
     if (message.trim()) {
-      setMessages([...messages, message]);
       setMessage("");
+      handleSendMessageRequest(message);
     }
   };
 
@@ -154,12 +196,12 @@ const Chat = () => {
                 boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
               }}
             >
-              {msg}
+              <strong>{msg.user_name}: </strong> {msg.message}
             </div>
           ))}
         </div>
 
-         <div
+        <div
           style={{
             display: "flex",
             padding: "10px",

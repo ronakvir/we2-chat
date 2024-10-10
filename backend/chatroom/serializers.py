@@ -36,16 +36,15 @@ class MessagesListSerializer(serializers.ModelSerializer):
         fields = ["chat_room", "user_name", "message", "created_at"]  # noqa: RUF012
 
 class MessagesCreateSerializer(serializers.ModelSerializer):
-    room_name = serializers.CharField(write_only=True)  # Accept room_name in the request instead of chat_room
+    room_name = serializers.CharField(write_only=True)
 
     class Meta:
         model = Messages
-        fields = ["room_name", "user_name", "message"]  # No need to send chat_room or created_at
+        fields = ["room_name", "user_name", "message"]  # noqa: RUF012
 
     def create(self, validated_data):
         room_name = validated_data.pop('room_name')
         chat_room = ChatRoom.objects.get(room_name=room_name)
 
-        # Create the message with the resolved chat_room
         return Messages.objects.create(chat_room=chat_room, **validated_data)
 
