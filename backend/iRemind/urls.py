@@ -5,9 +5,8 @@ import django_js_reverse.views
 from chatroom.routes import routes as chatroom_routes
 from chatroom.views import (
     CreateChatRoomOrIncrementUserCount,
-    DecrementUserCountAPIView,
     DecrementUserCountOrDeleteChatRoom,
-    IncrementUserCountAPIView,
+    CreateEvent
 )
 from common.routes import routes as common_routes
 from drf_spectacular.views import (
@@ -32,8 +31,11 @@ urlpatterns = [
     path("jsreverse/", django_js_reverse.views.urls_js, name="js_reverse"),
     path("api/", include(router.urls), name="api"),
 
+    # chatrooms
     path('api/chatrooms/join/', CreateChatRoomOrIncrementUserCount.as_view(), name='chatroom-join'),
     path('api/chatrooms/leave/', DecrementUserCountOrDeleteChatRoom.as_view(), name='chatroom-leave'),
+    #events
+    path('api/events/create/', CreateEvent.as_view(), name='event-create'),
 
 
     # drf-spectacular

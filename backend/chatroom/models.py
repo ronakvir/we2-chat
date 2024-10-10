@@ -8,3 +8,17 @@ class ChatRoom(models.Model):
 
     def __str__(self):
         return self.room_name
+
+class Events(models.Model):
+    event_name = models.CharField(max_length=255)
+    expires_at = models.DateTimeField()
+    chat_room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(fields=['event_name', 'is_active'], name='UX-event_name_per_active_status')
+        ]
+
+    def __str__(self):
+        return self.event_name

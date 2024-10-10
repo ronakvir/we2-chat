@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { useNavigate } from "react-router-dom";
 
 import iRemindlogo from "../../assets/images/we2logo.png";

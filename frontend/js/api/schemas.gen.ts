@@ -32,8 +32,36 @@ export const $CreateChatRoom = {
       type: "string",
       maxLength: 255,
     },
+    user_count: {
+      type: "integer",
+      readOnly: true,
+    },
   },
-  required: ["room_name"],
+  required: ["room_name", "user_count"],
+} as const;
+
+export const $Events = {
+  type: "object",
+  properties: {
+    event_name: {
+      type: "string",
+      maxLength: 255,
+    },
+    expires_at: {
+      type: "string",
+      format: "date-time",
+    },
+    chat_room: {
+      type: "integer",
+      readOnly: true,
+    },
+    is_active: {
+      type: "boolean",
+      readOnly: true,
+      default: true,
+    },
+  },
+  required: ["chat_room", "event_name", "expires_at", "is_active"],
 } as const;
 
 export const $Message = {

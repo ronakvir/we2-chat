@@ -16,14 +16,12 @@ import type {
   ChatroomPartialUpdateResponse,
   ChatroomDestroyData,
   ChatroomDestroyResponse,
-  ChatroomsDecrementPartialUpdateData,
-  ChatroomsDecrementPartialUpdateResponse,
-  ChatroomsIncrementPartialUpdateData,
-  ChatroomsIncrementPartialUpdateResponse,
   ChatroomsJoinCreateData,
   ChatroomsJoinCreateResponse,
   ChatroomsLeaveCreateData,
   ChatroomsLeaveCreateResponse,
+  EventsCreateCreateData,
+  EventsCreateCreateResponse,
   RestRestCheckRetrieveResponse,
   UsersListData,
   UsersListResponse,
@@ -160,40 +158,6 @@ export class ChatroomsService {
   /**
    * @param data The data for the request.
    * @param data.requestBody
-   * @returns ChatRoomSeralizer
-   * @throws ApiError
-   */
-  public static chatroomsDecrementPartialUpdate(
-    data: ChatroomsDecrementPartialUpdateData = {},
-  ): CancelablePromise<ChatroomsDecrementPartialUpdateResponse> {
-    return __request(OpenAPI, {
-      method: "PATCH",
-      url: "/api/chatrooms/decrement/",
-      body: data.requestBody,
-      mediaType: "application/json",
-    });
-  }
-
-  /**
-   * @param data The data for the request.
-   * @param data.requestBody
-   * @returns ChatRoomSeralizer
-   * @throws ApiError
-   */
-  public static chatroomsIncrementPartialUpdate(
-    data: ChatroomsIncrementPartialUpdateData = {},
-  ): CancelablePromise<ChatroomsIncrementPartialUpdateResponse> {
-    return __request(OpenAPI, {
-      method: "PATCH",
-      url: "/api/chatrooms/increment/",
-      body: data.requestBody,
-      mediaType: "application/json",
-    });
-  }
-
-  /**
-   * @param data The data for the request.
-   * @param data.requestBody
    * @returns CreateChatRoom
    * @throws ApiError
    */
@@ -220,6 +184,25 @@ export class ChatroomsService {
     return __request(OpenAPI, {
       method: "POST",
       url: "/api/chatrooms/leave/",
+      body: data.requestBody,
+      mediaType: "application/json",
+    });
+  }
+}
+
+export class EventsService {
+  /**
+   * @param data The data for the request.
+   * @param data.requestBody
+   * @returns Events
+   * @throws ApiError
+   */
+  public static eventsCreateCreate(
+    data: EventsCreateCreateData,
+  ): CancelablePromise<EventsCreateCreateResponse> {
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/events/create/",
       body: data.requestBody,
       mediaType: "application/json",
     });

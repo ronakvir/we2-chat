@@ -4,8 +4,8 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import ChatRoom
-from .serializers import ChatRoomSeralizer, CreateChatRoomSerializer
+from .models import ChatRoom, Events
+from .serializers import ChatRoomSeralizer, CreateChatRoomSerializer, EventsSerializer
 
 
 class ChatRoomViewSet(viewsets.ModelViewSet):
@@ -100,4 +100,42 @@ class DecrementUserCountOrDeleteChatRoom(APIView):
             return Response({
                 'message': f'ChatRoom "{room_name}" deleted as user count reached 0.'
             }, status=status.HTTP_200_OK)
+
+class CreateEvent(APIView):
+    serializer_class = EventsSerializer
+
+    def post(self, request):
+        event_name = request.data.get('event_name')
+        expires_at = request.data.get('expires_at')
+        room_name = request.data.get('room_name', event_name)
+
+        if not event_name:
+            return Response({'error': 'event_name is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not expires_at:
+            return Response({'error': 'expires_at is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if Events.objects.filter(event_name=event_name).exists():
+            return Response({'error': 'Event with this name already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        if ChatRoom.objects.filter(room_name=event_name).exists():
+            return Response({'error': 'ChatRoom with this name already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        chat_room = ChatRoom.objects.create(room_name=room_name, user_count=0)
+
+        data = {
+            'event_name': event_name,
+            'expires_at': expires_at,
+            'is_active': True
+        }
+
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            serializer.save(chat_room=chat_room)
+            return Response({
+                'message': 'Event created successfully',
+                'event': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            chat_room.delete()
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

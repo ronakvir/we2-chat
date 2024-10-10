@@ -9,6 +9,14 @@ export type ChatRoomSeralizer = {
 
 export type CreateChatRoom = {
   room_name: string;
+  readonly user_count: number;
+};
+
+export type Events = {
+  event_name: string;
+  expires_at: string;
+  readonly chat_room: number;
+  readonly is_active: boolean;
 };
 
 export type Message = {
@@ -134,18 +142,6 @@ export type ChatroomDestroyData = {
 
 export type ChatroomDestroyResponse = void;
 
-export type ChatroomsDecrementPartialUpdateData = {
-  requestBody?: PatchedChatRoomSeralizer;
-};
-
-export type ChatroomsDecrementPartialUpdateResponse = ChatRoomSeralizer;
-
-export type ChatroomsIncrementPartialUpdateData = {
-  requestBody?: PatchedChatRoomSeralizer;
-};
-
-export type ChatroomsIncrementPartialUpdateResponse = ChatRoomSeralizer;
-
 export type ChatroomsJoinCreateData = {
   requestBody: CreateChatRoom;
 };
@@ -157,6 +153,12 @@ export type ChatroomsLeaveCreateData = {
 };
 
 export type ChatroomsLeaveCreateResponse = CreateChatRoom;
+
+export type EventsCreateCreateData = {
+  requestBody: Events;
+};
+
+export type EventsCreateCreateResponse = Events;
 
 export type RestRestCheckRetrieveResponse = Message;
 
@@ -261,22 +263,6 @@ export type $OpenApiTs = {
       };
     };
   };
-  "/api/chatrooms/decrement/": {
-    patch: {
-      req: ChatroomsDecrementPartialUpdateData;
-      res: {
-        200: ChatRoomSeralizer;
-      };
-    };
-  };
-  "/api/chatrooms/increment/": {
-    patch: {
-      req: ChatroomsIncrementPartialUpdateData;
-      res: {
-        200: ChatRoomSeralizer;
-      };
-    };
-  };
   "/api/chatrooms/join/": {
     post: {
       req: ChatroomsJoinCreateData;
@@ -290,6 +276,14 @@ export type $OpenApiTs = {
       req: ChatroomsLeaveCreateData;
       res: {
         200: CreateChatRoom;
+      };
+    };
+  };
+  "/api/events/create/": {
+    post: {
+      req: EventsCreateCreateData;
+      res: {
+        200: Events;
       };
     };
   };

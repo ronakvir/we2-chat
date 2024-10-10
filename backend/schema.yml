@@ -24,6 +24,7 @@ paths:
       - chatroom
       security:
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -49,6 +50,7 @@ paths:
         required: true
       security:
       - cookieAuth: []
+      - {}
       responses:
         '201':
           content:
@@ -70,6 +72,7 @@ paths:
       - chatroom
       security:
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -102,6 +105,7 @@ paths:
         required: true
       security:
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -133,6 +137,7 @@ paths:
               $ref: '#/components/schemas/PatchedChatRoomSeralizer'
       security:
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -153,59 +158,10 @@ paths:
       - chatroom
       security:
       - cookieAuth: []
+      - {}
       responses:
         '204':
           description: No response body
-  /api/chatrooms/decrement/:
-    patch:
-      operationId: chatrooms_decrement_partial_update
-      tags:
-      - chatrooms
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
-      security:
-      - cookieAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ChatRoomSeralizer'
-          description: ''
-  /api/chatrooms/increment/:
-    patch:
-      operationId: chatrooms_increment_partial_update
-      tags:
-      - chatrooms
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedChatRoomSeralizer'
-      security:
-      - cookieAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ChatRoomSeralizer'
-          description: ''
   /api/chatrooms/join/:
     post:
       operationId: chatrooms_join_create
@@ -225,6 +181,7 @@ paths:
         required: true
       security:
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -251,12 +208,40 @@ paths:
         required: true
       security:
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreateChatRoom'
+          description: ''
+  /api/events/create/:
+    post:
+      operationId: events_create_create
+      tags:
+      - events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Events'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Events'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Events'
+        required: true
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Events'
           description: ''
   /api/rest/rest-check/:
     get:
@@ -301,6 +286,7 @@ paths:
       - users
       security:
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -326,6 +312,7 @@ paths:
         required: true
       security:
       - cookieAuth: []
+      - {}
       responses:
         '201':
           content:
@@ -347,6 +334,7 @@ paths:
       - users
       security:
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -379,6 +367,7 @@ paths:
         required: true
       security:
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -410,6 +399,7 @@ paths:
               $ref: '#/components/schemas/PatchedUser'
       security:
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -430,6 +420,7 @@ paths:
       - users
       security:
       - cookieAuth: []
+      - {}
       responses:
         '204':
           description: No response body
@@ -462,8 +453,33 @@ components:
         room_name:
           type: string
           maxLength: 255
+        user_count:
+          type: integer
+          readOnly: true
       required:
       - room_name
+      - user_count
+    Events:
+      type: object
+      properties:
+        event_name:
+          type: string
+          maxLength: 255
+        expires_at:
+          type: string
+          format: date-time
+        chat_room:
+          type: integer
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+          default: true
+      required:
+      - chat_room
+      - event_name
+      - expires_at
+      - is_active
     Message:
       type: object
       properties:
