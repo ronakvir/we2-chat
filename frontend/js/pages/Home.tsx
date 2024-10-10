@@ -175,7 +175,18 @@ const Home = () => {
       {isModalOpen && (
         <div className="modal">
           <div className="modal-content">
-            <span className="close" onClick={closeModal}>
+            <span
+              aria-label="Close Modal"
+              className="close"
+              role="button"
+              tabIndex={0}
+              onClick={closeModal}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  closeModal();
+                }
+              }}
+            >
               &times;
             </span>
             <h2 className="text-center">Top Channels</h2>
@@ -194,17 +205,22 @@ const Home = () => {
                       borderBottom: "1px solid #ddd",
                     }}
                   >
-                    <a
-                      href="#"
+                    <button
                       style={{
+                        background: "none",
+                        border: "none",
+                        padding: 0,
+                        margin: 0,
                         textDecoration: "none",
                         color: "#4CAF50",
                         fontSize: "18px",
+                        cursor: "pointer",
                       }}
+                      type="button"
                       onClick={() => handleRoomClick(chat.room_name)}
                     >
                       {chat.room_name}
-                    </a>
+                    </button>
                     <span style={{ color: "#555", fontSize: "14px" }}>
                       {chat.user_count ?? "N/A"} active users
                     </span>

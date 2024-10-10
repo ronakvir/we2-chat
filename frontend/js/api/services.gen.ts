@@ -23,6 +23,9 @@ import type {
   ChatroomsTop5RetrieveResponse,
   EventsCreateCreateData,
   EventsCreateCreateResponse,
+  MessagesCreateCreateData,
+  MessagesCreateCreateResponse,
+  MessagesGetRetrieveResponse,
   RestRestCheckRetrieveResponse,
   UsersListData,
   UsersListResponse,
@@ -217,6 +220,36 @@ export class EventsService {
       url: "/api/events/create/",
       body: data.requestBody,
       mediaType: "application/json",
+    });
+  }
+}
+
+export class MessagesService {
+  /**
+   * @param data The data for the request.
+   * @param data.requestBody
+   * @returns MessagesCreate
+   * @throws ApiError
+   */
+  public static messagesCreateCreate(
+    data: MessagesCreateCreateData,
+  ): CancelablePromise<MessagesCreateCreateResponse> {
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/messages/create/",
+      body: data.requestBody,
+      mediaType: "application/json",
+    });
+  }
+
+  /**
+   * @returns MessagesList
+   * @throws ApiError
+   */
+  public static messagesGetRetrieve(): CancelablePromise<MessagesGetRetrieveResponse> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/messages/get/",
     });
   }
 }

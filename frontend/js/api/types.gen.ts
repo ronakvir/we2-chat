@@ -23,6 +23,19 @@ export type Message = {
   image: string;
 };
 
+export type MessagesCreate = {
+  room_name: string;
+  user_name: string;
+  message: string;
+};
+
+export type MessagesList = {
+  readonly chat_room: string;
+  user_name: string;
+  message: string;
+  readonly created_at: string;
+};
+
 export type PaginatedChatRoomSeralizerList = {
   count: number;
   next?: string | null;
@@ -165,6 +178,14 @@ export type EventsCreateCreateData = {
 
 export type EventsCreateCreateResponse = Events;
 
+export type MessagesCreateCreateData = {
+  requestBody: MessagesCreate;
+};
+
+export type MessagesCreateCreateResponse = MessagesCreate;
+
+export type MessagesGetRetrieveResponse = MessagesList;
+
 export type RestRestCheckRetrieveResponse = Message;
 
 export type UsersListData = {
@@ -296,6 +317,21 @@ export type $OpenApiTs = {
       req: EventsCreateCreateData;
       res: {
         200: Events;
+      };
+    };
+  };
+  "/api/messages/create/": {
+    post: {
+      req: MessagesCreateCreateData;
+      res: {
+        200: MessagesCreate;
+      };
+    };
+  };
+  "/api/messages/get/": {
+    get: {
+      res: {
+        200: MessagesList;
       };
     };
   };

@@ -74,6 +74,47 @@ export const $Message = {
   required: ["image", "message"],
 } as const;
 
+export const $MessagesCreate = {
+  type: "object",
+  properties: {
+    room_name: {
+      type: "string",
+      writeOnly: true,
+    },
+    user_name: {
+      type: "string",
+      maxLength: 255,
+    },
+    message: {
+      type: "string",
+    },
+  },
+  required: ["message", "room_name", "user_name"],
+} as const;
+
+export const $MessagesList = {
+  type: "object",
+  properties: {
+    chat_room: {
+      type: "string",
+      readOnly: true,
+    },
+    user_name: {
+      type: "string",
+      maxLength: 255,
+    },
+    message: {
+      type: "string",
+    },
+    created_at: {
+      type: "string",
+      format: "date-time",
+      readOnly: true,
+    },
+  },
+  required: ["chat_room", "created_at", "message", "user_name"],
+} as const;
+
 export const $PaginatedChatRoomSeralizerList = {
   type: "object",
   required: ["count", "results"],

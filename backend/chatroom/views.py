@@ -4,11 +4,13 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import ChatRoom, Events
+from .models import ChatRoom, Events, Messages
 from .serializers import (
     ChatRoomSeralizer,
     CreateChatRoomSerializer,
     EventsSerializer,
+    MessagesListSerializer,
+    MessagesCreateSerializer,
     TopChatsResponseSerializer,
 )
 
@@ -163,4 +165,36 @@ class Top5ActiveChatsCount(APIView):
             return Response(response_serializer.data, status=status.HTTP_200_OK)
         return Response(response_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class MessagesListView(APIView):
+    serializer_class = MessagesListSerializer
 
+    def get(self, request):
+        room_name = request.query_params.get('room_name')
+        offset = int(request.query_params.get('offset', 0))
+        limit = int(request.query_params.get('limit', 10))
+
+        if not room_name:
+            return Response({'error': 'room_name is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        chatroom = get_object_or_404(ChatRoom, room_name=room_name)
+
+        messages = Messages.objects.filter(chat_room=chatroom).order_by('-created_at')[offset:offset + limit]
+        serializer = self.serializer_class(messages, many=True)
+
+        return Response({
+            'room_name': room_name,
+            'messages': serializer.data
+        }, status=status.HTTP_200_OK)
+
+class MessagesCreateView(APIView):
+    serializer_class = MessagesCreateSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'message': 'Message sent successfully',
+                'messagedata': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

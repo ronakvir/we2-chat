@@ -7,6 +7,8 @@ from chatroom.views import (
     CreateChatRoomOrIncrementUserCount,
     CreateEvent,
     DecrementUserCountOrDeleteChatRoom,
+    MessagesCreateView,
+    MessagesListView,
     Top5ActiveChatsCount,
 )
 from common.routes import routes as common_routes
@@ -36,6 +38,9 @@ urlpatterns = [
     path('api/chatrooms/join/', CreateChatRoomOrIncrementUserCount.as_view(), name='chatroom-join'),
     path('api/chatrooms/leave/', DecrementUserCountOrDeleteChatRoom.as_view(), name='chatroom-leave'),
     path('api/chatrooms/top5/', Top5ActiveChatsCount.as_view(), name='chatroom-top5'),
+    # messages
+    path('api/messages/get/', MessagesListView.as_view(), name='messages-list'),  # For GET
+    path('api/messages/create/', MessagesCreateView.as_view(), name='messages-create'),  # For POST
     #events
     path('api/events/create/', CreateEvent.as_view(), name='event-create'),
 

@@ -258,6 +258,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/Events'
           description: ''
+  /api/messages/create/:
+    post:
+      operationId: messages_create_create
+      tags:
+      - messages
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessagesCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MessagesCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MessagesCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesCreate'
+          description: ''
+  /api/messages/get/:
+    get:
+      operationId: messages_get_retrieve
+      tags:
+      - messages
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesList'
+          description: ''
   /api/rest/rest-check/:
     get:
       operationId: rest_rest_check_retrieve
@@ -502,6 +544,41 @@ components:
       required:
       - image
       - message
+    MessagesCreate:
+      type: object
+      properties:
+        room_name:
+          type: string
+          writeOnly: true
+        user_name:
+          type: string
+          maxLength: 255
+        message:
+          type: string
+      required:
+      - message
+      - room_name
+      - user_name
+    MessagesList:
+      type: object
+      properties:
+        chat_room:
+          type: string
+          readOnly: true
+        user_name:
+          type: string
+          maxLength: 255
+        message:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - chat_room
+      - created_at
+      - message
+      - user_name
     PaginatedChatRoomSeralizerList:
       type: object
       required:

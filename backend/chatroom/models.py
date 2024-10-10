@@ -22,3 +22,12 @@ class Events(models.Model):
 
     def __str__(self):
         return self.event_name
+
+class Messages(models.Model):
+    chat_room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
+    user_name = models.CharField(max_length=255)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.message
