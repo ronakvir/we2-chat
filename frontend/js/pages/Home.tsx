@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import iRemindlogo from "../../assets/images/we2logo.png";
 import { RestService } from "../api";
@@ -9,6 +10,7 @@ const Home = () => {
   const [username, setUsername] = useState(""); // State for username input
   const [channel, setChannel] = useState(""); // State for channel input
   const [showContent, setShowContent] = useState(false); // State to toggle page display
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedUsername = localStorage.getItem("username");
@@ -62,7 +64,7 @@ const Home = () => {
   ) => {
     const trimmedChannel = channel.trim();
     if (event.key === "Enter" && trimmedChannel !== "") {
-      window.location.href = `http://localhost:8000/chat?channel=${trimmedChannel}`;
+      navigate(`/chat?channel=${trimmedChannel}`);
     }
   };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import iRemindlogo from "../../assets/images/we2logo.png";
 import {
@@ -9,11 +9,6 @@ import {
   ChatroomsService,
 } from "../api";
 
-const handleLogoKeyPress = (event: { key: string }) => {
-  if (event.key === "Enter" || event.key === " ") {
-    window.location.href = `http://localhost:8000/`;
-  }
-};
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -25,13 +20,14 @@ const Chat = () => {
   const [username, setUsername] = useState("");
   const query = useQuery();
   const roomName = query.get("channel") || "";
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedUsername = localStorage.getItem("username");
     if (savedUsername) {
       setUsername(savedUsername);
     } else {
-      window.location.href = `http://localhost:8000/`;
+      navigate("/");
     }
     const handleJoinOrCreateChatroom = async () => {
       try {
@@ -43,7 +39,7 @@ const Chat = () => {
         console.log("Successfully joined or created chatroom:", joinCreate);
       } catch (error) {
         console.error("Error joining or creating chatroom:", error);
-        window.location.href = `http://localhost:8000/`;
+        navigate("/");
       }
     };
 
@@ -87,6 +83,12 @@ const Chat = () => {
     }
   };
 
+  const handleLogoKeyPress = (event: { key: string }) => {
+    if (event.key === "Enter" || event.key === " ") {
+      navigate("/");
+    }
+  };
+
   return (
     <div
       style={{
@@ -108,7 +110,7 @@ const Chat = () => {
           }}
           type="button"
           onClick={() => {
-            window.location.href = `http://localhost:8000/`;
+            navigate("/");
           }}
           onKeyDown={handleLogoKeyPress}
         >
