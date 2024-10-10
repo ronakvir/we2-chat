@@ -20,6 +20,7 @@ import type {
   ChatroomsJoinCreateResponse,
   ChatroomsLeaveCreateData,
   ChatroomsLeaveCreateResponse,
+  ChatroomsTop5RetrieveResponse,
   EventsCreateCreateData,
   EventsCreateCreateResponse,
   RestRestCheckRetrieveResponse,
@@ -186,6 +187,17 @@ export class ChatroomsService {
       url: "/api/chatrooms/leave/",
       body: data.requestBody,
       mediaType: "application/json",
+    });
+  }
+
+  /**
+   * @returns ChatRoomSeralizer
+   * @throws ApiError
+   */
+  public static chatroomsTop5Retrieve(): CancelablePromise<ChatroomsTop5RetrieveResponse> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/chatrooms/top5/",
     });
   }
 }

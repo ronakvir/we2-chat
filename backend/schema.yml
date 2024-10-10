@@ -216,6 +216,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/CreateChatRoom'
           description: ''
+  /api/chatrooms/top5/:
+    get:
+      operationId: chatrooms_top5_retrieve
+      tags:
+      - chatrooms
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatRoomSeralizer'
+          description: ''
   /api/events/create/:
     post:
       operationId: events_create_create

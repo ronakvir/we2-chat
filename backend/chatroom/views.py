@@ -96,6 +96,14 @@ class DecrementUserCountOrDeleteChatRoom(APIView):
                 'message': 'User count decremented successfully',
             }, status=status.HTTP_200_OK)
         else:
+            associated_events = Events.objects.filter(chat_room=chatroom, is_active=True).exists()
+            if associated_events:
+                chatroom.user_count -= 1
+                chatroom.save()
+                return Response({
+                    'error': f'Successfuly left - ChatRoom "{room_name}" cannot be deleted as it has associated events.'
+                }, status=status.HTTP_200_OK)
+
             chatroom.delete()
             return Response({
                 'message': f'ChatRoom "{room_name}" deleted as user count reached 0.'
@@ -138,4 +146,15 @@ class CreateEvent(APIView):
         else:
             chat_room.delete()
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class Top5ActiveChatsCount(APIView):
+    serializer_class = ChatRoomSeralizer
+
+    def get(self, request):
+        top_chats = ChatRoom.objects.distinct().order_by('-user_count')[:5]
+
+        serializer = self.serializer_class(top_chats, many=True)
+        return Response({
+            'top_chats': serializer.data
+        }, status=status.HTTP_200_OK)
 

@@ -153,6 +153,8 @@ export type ChatroomsLeaveCreateData = {
 
 export type ChatroomsLeaveCreateResponse = CreateChatRoom;
 
+export type ChatroomsTop5RetrieveResponse = ChatRoomSeralizer;
+
 export type EventsCreateCreateData = {
   requestBody: Events;
 };
@@ -275,6 +277,13 @@ export type $OpenApiTs = {
       req: ChatroomsLeaveCreateData;
       res: {
         200: CreateChatRoom;
+      };
+    };
+  };
+  "/api/chatrooms/top5/": {
+    get: {
+      res: {
+        200: ChatRoomSeralizer;
       };
     };
   };

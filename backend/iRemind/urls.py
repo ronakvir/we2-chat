@@ -7,6 +7,7 @@ from chatroom.views import (
     CreateChatRoomOrIncrementUserCount,
     CreateEvent,
     DecrementUserCountOrDeleteChatRoom,
+    Top5ActiveChatsCount,
 )
 from common.routes import routes as common_routes
 from drf_spectacular.views import (
@@ -34,6 +35,7 @@ urlpatterns = [
     # chatrooms
     path('api/chatrooms/join/', CreateChatRoomOrIncrementUserCount.as_view(), name='chatroom-join'),
     path('api/chatrooms/leave/', DecrementUserCountOrDeleteChatRoom.as_view(), name='chatroom-leave'),
+    path('api/chatrooms/top5/', Top5ActiveChatsCount.as_view(), name='chatroom-top5'),
     #events
     path('api/events/create/', CreateEvent.as_view(), name='event-create'),
 

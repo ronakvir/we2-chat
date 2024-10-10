@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from "react";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { useNavigate } from "react-router-dom";
 
 import iRemindlogo from "../../assets/images/we2logo.png";
-import { RestService } from "../api";
+import { RestService, ChatroomsService } from "../api";
+
+type ChatRoom = {
+  id: number;
+  room_name: string;
+  created_at: string;
+  user_count?: number;
+};
 
 const Home = () => {
-  const [restCheck, setRestCheck] =
-    useState<Awaited<ReturnType<typeof RestService.restRestCheckRetrieve>>>();
+  const [restCheck, setRestCheck] = useState<
+    Awaited<ReturnType<typeof RestService.restRestCheckRetrieve>> | undefined
+  >(undefined);
+  const [topChats, setTopChats] = useState<ChatRoom[]>([]);
   const [username, setUsername] = useState(""); // State for username input
   const [channel, setChannel] = useState(""); // State for channel input
   const [showContent, setShowContent] = useState(false); // State to toggle page display
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,9 +31,25 @@ const Home = () => {
 
     async function onFetchRestCheck() {
       setRestCheck(await RestService.restRestCheckRetrieve());
+      const topChatsData = await ChatroomsService.chatroomsTop5Retrieve();
+      setTopChats(topChatsData.top_chats || []);
     }
     onFetchRestCheck();
   }, []);
+
+  // Open modal
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleRoomClick = (roomName: string) => {
+    navigate(`/chat/?channel=${roomName}`);
+  };
 
   // Handle input change for username
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,18 +73,10 @@ const Home = () => {
     setShowContent(false);
   };
 
-  // Handle input change for channel
   const handleChannelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChannel(event.target.value);
   };
 
-  const handleLogoKeyPress = (event: { key: string }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      setShowContent(false);
-    }
-  };
-
-  // Handle key down for channel input (on "Enter" key press)
   const handleChannelKeyDown = (
     event: React.KeyboardEvent<HTMLInputElement>,
   ) => {
@@ -82,7 +99,6 @@ const Home = () => {
           }}
           type="button"
           onClick={() => setShowContent(false)}
-          onKeyDown={handleLogoKeyPress}
         >
           <img
             alt="iRemind Logo"
@@ -115,11 +131,24 @@ const Home = () => {
         </div>
       ) : (
         <div className="text-center">
-          <div id="django-background">Browse top channels:</div>
-          <p>{restCheck?.message}</p>
-          {restCheck?.image && (
-            <img alt="backend-shit" src={restCheck?.image} />
-          )}
+          <div>
+            <button
+              style={{
+                padding: "10px 20px",
+                fontSize: "16px",
+                backgroundColor: "#4CAF50",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+              type="button"
+              onClick={openModal}
+            >
+              Browse top channels
+            </button>
+          </div>
+
           <div id="django-background">Create your own channel:</div>
 
           <div>
@@ -148,6 +177,50 @@ const Home = () => {
             >
               change current name: {username}
             </button>
+          </div>
+        </div>
+      )}
+
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={closeModal}>
+              &times;
+            </span>
+            <h2 className="text-center">Top Channels</h2>
+            {topChats.length === 0 ? (
+              <p>No active chat rooms available.</p>
+            ) : (
+              <ul style={{ listStyleType: "none", padding: 0 }}>
+                {topChats.map((chat) => (
+                  <li
+                    key={chat.id}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      padding: "10px 0",
+                      borderBottom: "1px solid #ddd",
+                    }}
+                  >
+                    <a
+                      href="#"
+                      style={{
+                        textDecoration: "none",
+                        color: "#4CAF50",
+                        fontSize: "18px",
+                      }}
+                      onClick={() => handleRoomClick(chat.room_name)}
+                    >
+                      {chat.room_name}
+                    </a>
+                    <span style={{ color: "#555", fontSize: "14px" }}>
+                      {chat.user_count ?? "N/A"} active users
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       )}
