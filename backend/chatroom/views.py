@@ -157,9 +157,10 @@ class Top5ActiveChatsCount(APIView):
 
     def get(self, request):
         top_chats = ChatRoom.objects.distinct().order_by('-user_count')[:5]
+        chat_serializer = ChatRoomSeralizer(top_chats, many=True)
+        response_serializer = self.serializer_class(data={'top_chats': chat_serializer.data})
+        if response_serializer.is_valid():
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+        return Response(response_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.serializer_class(top_chats, many=True)
-        return Response({
-            'top_chats': serializer.data
-        }, status=status.HTTP_200_OK)
 
