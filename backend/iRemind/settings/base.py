@@ -222,15 +222,21 @@ CSP_CONNECT_SRC = [
     "'self'",
     "*.sentry.io",
 ] + [f"*{host}" if host.startswith(".") else host for host in ALLOWED_HOSTS]
+
 if DEBUG:
     websocket_protocol = "ws://"
 else:
     websocket_protocol = "wss://"
 
-CSP_CONNECT_SRC += [
-    f"{websocket_protocol}{host}" if not host.startswith("http") else f"{websocket_protocol}{host.split('://')[1]}"
-    for host in ALLOWED_HOSTS
-]
+for host in ALLOWED_HOSTS:
+    if host != "*":
+        ws_url = f"{websocket_protocol}{host}"
+        print(f"Generated WebSocket URL: {ws_url}")
+        CSP_CONNECT_SRC.append(ws_url)
+
+if "*" in ALLOWED_HOSTS:
+    CSP_CONNECT_SRC.append(f"{websocket_protocol}*")
+
 
 CSP_STYLE_SRC = [
     "'self'",
