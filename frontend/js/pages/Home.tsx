@@ -59,7 +59,15 @@ const Home = () => {
     const trimmedUsername = username.trim();
     if (event.key === "Enter" && trimmedUsername !== "") {
       localStorage.setItem("username", trimmedUsername);
-      setShowContent(true); // Show the rest of the page
+      const searchParams = new URLSearchParams(window.location.search);
+      const nextUrl = searchParams.get("next");
+      const channel = searchParams.get("channel");
+
+      if (nextUrl && channel) {
+        navigate(`${nextUrl}?channel=${channel}`);
+      } else {
+        setShowContent(true);
+      }
     }
   };
 
@@ -144,18 +152,16 @@ const Home = () => {
             </button>
           </div>
 
-          <div id="django-background">Create your own channel:</div>
-
           <div>
             <input
-              placeholder="Enter channel name"
+              placeholder="Create your own channel:"
               style={{ margin: "10px 0", padding: "8px", width: "300px" }}
               type="text"
               value={channel}
               onChange={handleChannelChange}
               onKeyDown={handleChannelKeyDown}
             />
-            <p>You entered: {channel}</p>
+            <div />
             <button
               style={{
                 padding: "10px 20px",

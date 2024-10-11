@@ -4,7 +4,7 @@ import json
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from .models import ChatRoom, Messages
+from .models import ChatRoom, Events, Messages
 
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
@@ -110,8 +110,14 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
                 chatroom.save()
                 print(f"Decremented user count for room: {self.room_name}, new count: {chatroom.user_count}")
             else:
-                chatroom.delete()
-                print(f"Deleted chatroom: {self.room_name}")
+                associated_events = Events.objects.filter(chat_room=self.room_name, is_active=True).exists()
+                if associated_events:
+                    chatroom.user_count -= 1
+                    chatroom.save()
+                    print(f'Successfuly left - ChatRoom "{self.room_name}" cannot be deleted as it has associated events.')
+                else:
+                    chatroom.delete()
+                    print(f"Deleted chatroom: {self.room_name}")
         except ChatRoom.DoesNotExist:
             print(f"Chat room {self.room_name} does not exist.")
         except Exception as e:

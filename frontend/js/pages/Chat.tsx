@@ -25,7 +25,7 @@ const Chat = () => {
     if (savedUsername) {
       setUsername(savedUsername);
     } else {
-      navigate("/");
+      navigate(`/?next=/chat/&channel=${roomName}`);
     }
 
     const handleGetMessageRequest = async () => {
@@ -50,7 +50,7 @@ const Chat = () => {
       try {
         const protocol = window.location.protocol === "https:" ? "wss" : "ws";
         const port = process.env.NODE_ENV === "production" ? "" : ":8000";
-        const wsUrl = `${protocol}://${window.location.hostname}${port}/ws/chat/${roomName}/`;
+        const wsUrl = `${protocol}://${window.location.hostname}${port}/ws/chat/${encodeURIComponent(roomName)}/`;
         const ws = new WebSocket(wsUrl);
         socketRef.current = ws;
 
