@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     "django_guid",
     "common",
     "users",
-    "chatroom"
+    "chatroom",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -221,6 +222,16 @@ CSP_CONNECT_SRC = [
     "'self'",
     "*.sentry.io",
 ] + [f"*{host}" if host.startswith(".") else host for host in ALLOWED_HOSTS]
+if DEBUG:
+    websocket_protocol = "ws://"
+else:
+    websocket_protocol = "wss://"
+
+CSP_CONNECT_SRC += [
+    f"{websocket_protocol}{host}" if not host.startswith("http") else f"{websocket_protocol}{host.split('://')[1]}"
+    for host in ALLOWED_HOSTS
+]
+
 CSP_STYLE_SRC = [
     "'self'",
     "'unsafe-inline'",
@@ -249,3 +260,16 @@ DEFENDER_LOGIN_FAILURE_LIMIT = 3
 DEFENDER_COOLOFF_TIME = 300  # 5 minutes
 DEFENDER_LOCKOUT_TEMPLATE = "defender/lockout.html"
 DEFENDER_REDIS_URL = config("REDIS_URL")
+
+ASGI_APPLICATION = 'iRemind.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('result', 6379)],
+        },
+    },
+}
+
+

@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import iRemindlogo from "../../assets/images/we2logo.png";
@@ -8,7 +8,6 @@ import {
   ChatroomsJoinCreateResponse,
   ChatroomsLeaveCreateResponse,
   ChatroomsService,
-  MessagesService,
   MessagesList,
 } from "../api";
 
@@ -25,6 +24,7 @@ const Chat = () => {
   const query = useQuery();
   const roomName = query.get("channel") || "";
   const navigate = useNavigate();
+  const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     const savedUsername = localStorage.getItem("username");
@@ -33,11 +33,11 @@ const Chat = () => {
     } else {
       navigate("/");
     }
+
     const handleJoinOrCreateChatroom = async () => {
       try {
         const joinCreate: ChatroomsJoinCreateResponse =
           await ChatroomsService.chatroomsJoinCreate({
-            // eslint-disable-next-line camelcase
             requestBody: { room_name: roomName },
           });
         console.log("Successfully joined or created chatroom:", joinCreate);
@@ -58,15 +58,12 @@ const Chat = () => {
         console.error("Error leaving chatroom:", error);
       }
     };
-    handleJoinOrCreateChatroom();
 
     const handleGetMessageRequest = async () => {
       try {
         const urlWithParams = `/api/messages/get/?room_name=${encodeURIComponent(roomName)}`;
         const response = await axios.get(urlWithParams);
-
         const { messages } = response.data;
-
         setMessages(
           messages.reverse().map((msg: MessagesList) => ({
             user_name: msg.user_name,
@@ -78,16 +75,41 @@ const Chat = () => {
       }
     };
 
-    handleGetMessageRequest();
+    const connectWebSocket = () => {
+      const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+      const port = process.env.NODE_ENV === "production" ? "" : ":8000";
+      const wsUrl = `${protocol}://${window.location.hostname}${port}/ws/chat/${roomName}/`;
+      const ws = new WebSocket(wsUrl);
+      socketRef.current = ws;
 
-    const pollingInterval = setInterval(() => {
-      handleGetMessageRequest();
-    }, 5000);
+      ws.addEventListener("message", (event) => {
+        const data = JSON.parse(event.data);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { user_name: data.user_name, message: data.message },
+        ]);
+      });
+
+      ws.addEventListener("error", (error) => {
+        console.error("WebSocket error:", error);
+      });
+
+      ws.addEventListener("close", () => {
+        console.log("WebSocket connection closed");
+      });
+    };
+
+    handleJoinOrCreateChatroom();
+    handleGetMessageRequest();
+    connectWebSocket();
+
     window.addEventListener("beforeunload", handleLeaveChatroom);
 
     return () => {
       handleLeaveChatroom();
-      clearInterval(pollingInterval);
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
       window.removeEventListener("beforeunload", handleLeaveChatroom);
     };
   }, [roomName]);
@@ -96,25 +118,15 @@ const Chat = () => {
     setMessage(event.target.value);
   };
 
-  const handleSendMessageRequest = async (message: string) => {
-    try {
-      await MessagesService.messagesCreateCreate({
-        requestBody: {
-          room_name: roomName,
-          user_name: username,
-          message,
-        },
-      });
-      setMessages([...messages, { user_name: username, message }]);
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
-  };
-
   const handleSendMessage = () => {
-    if (message.trim()) {
+    if (message.trim() && socketRef.current) {
+      const messageData = {
+        room_name: roomName,
+        user_name: username,
+        message,
+      };
+      socketRef.current.send(JSON.stringify(messageData));
       setMessage("");
-      handleSendMessageRequest(message);
     }
   };
 
