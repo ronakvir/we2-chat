@@ -25,15 +25,19 @@ const Home = () => {
       setUsername(savedUsername);
       setShowContent(true);
     }
-
-    async function onFetchRestCheck() {
-      const topChatsData = await ChatroomsService.chatroomsTop5Retrieve();
-      setTopChats(topChatsData.top_chats || []);
-    }
-    onFetchRestCheck();
   }, []);
 
-  const openModal = () => {
+  const fetchTopChats = async () => {
+    try {
+      const topChatsData = await ChatroomsService.chatroomsTop5Retrieve();
+      setTopChats(topChatsData.top_chats || []);
+    } catch (error) {
+      console.error("Error fetching top chats:", error);
+    }
+  };
+
+  const openModal = async () => {
+    await fetchTopChats();
     setIsModalOpen(true);
   };
 
@@ -194,9 +198,9 @@ const Home = () => {
               <p>No active chat rooms available.</p>
             ) : (
               <ul style={{ listStyleType: "none", padding: 0 }}>
-                {topChats.map((chat) => (
+                {topChats.map((chat, index) => (
                   <li
-                    key={chat.id}
+                    key={index}
                     style={{
                       display: "flex",
                       justifyContent: "space-between",

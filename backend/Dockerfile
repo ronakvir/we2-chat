@@ -13,27 +13,20 @@ RUN groupadd user && useradd --create-home --home-dir /home/user -g user user
 # Install system dependencies
 RUN apt-get update && apt-get install python3-dev gcc build-essential libpq-dev -y
 
-# Install Poetry
 RUN pip install "poetry==$POETRY_VERSION"
 
-# Copy dependency files
 COPY pyproject.toml /home/user/app/
 COPY poetry.lock* /home/user/app/
 
 WORKDIR /home/user/app/
 
-# Configure Poetry and install dependencies
 RUN poetry config virtualenvs.create false
 RUN poetry install --with dev --no-root --no-interaction --no-ansi
 
-# Copy the entire project code
 COPY . /home/user/app/
 
-# Set the working directory to where manage.py is located
 WORKDIR /home/user/app/backend
 
-# Change to the user
 USER user
 
-# Start the Daphne server with the correct module path
 CMD daphne -b 0.0.0.0 -p 8000 iRemind.asgi:application

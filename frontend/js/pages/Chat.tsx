@@ -4,12 +4,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import iRemindlogo from "../../assets/images/we2logo.png";
-import {
-  ChatroomsJoinCreateResponse,
-  ChatroomsLeaveCreateResponse,
-  ChatroomsService,
-  MessagesList,
-} from "../api";
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -34,85 +28,65 @@ const Chat = () => {
       navigate("/");
     }
 
-    const handleJoinOrCreateChatroom = async () => {
-      try {
-        const joinCreate: ChatroomsJoinCreateResponse =
-          await ChatroomsService.chatroomsJoinCreate({
-            requestBody: { room_name: roomName },
-          });
-        console.log("Successfully joined or created chatroom:", joinCreate);
-      } catch (error) {
-        console.error("Error joining or creating chatroom:", error);
-        navigate("/");
-      }
-    };
-
-    const handleLeaveChatroom = async () => {
-      try {
-        const leaveResponse: ChatroomsLeaveCreateResponse =
-          await ChatroomsService.chatroomsLeaveCreate({
-            requestBody: { room_name: roomName },
-          });
-        console.log("Successfully left chatroom:", leaveResponse);
-      } catch (error) {
-        console.error("Error leaving chatroom:", error);
-      }
-    };
-
     const handleGetMessageRequest = async () => {
       try {
         const urlWithParams = `/api/messages/get/?room_name=${encodeURIComponent(roomName)}`;
-        const response = await axios.get(urlWithParams);
-        const { messages } = response.data;
+        console.log(`Fetching messages from: ${urlWithParams}`);
+        const { data } = await axios.get(urlWithParams);
         setMessages(
-          messages.reverse().map((msg: MessagesList) => ({
-            user_name: msg.user_name,
-            message: msg.message,
-          })),
+          data.messages
+            .reverse()
+            .map((msg: { user_name: string; message: string }) => ({
+              user_name: msg.user_name,
+              message: msg.message,
+            })),
         );
       } catch (error) {
         console.error("Error getting messages:", error);
       }
     };
 
-    const connectWebSocket = () => {
-      const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-      const port = process.env.NODE_ENV === "production" ? "" : ":8000";
-      const wsUrl = `${protocol}://${window.location.hostname}${port}/ws/chat/${roomName}/`;
-      const ws = new WebSocket(wsUrl);
-      socketRef.current = ws;
+    const connectWebSocket = async () => {
+      try {
+        const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+        const port = process.env.NODE_ENV === "production" ? "" : ":8000";
+        const wsUrl = `${protocol}://${window.location.hostname}${port}/ws/chat/${roomName}/`;
+        const ws = new WebSocket(wsUrl);
+        socketRef.current = ws;
 
-      ws.addEventListener("message", (event) => {
-        const data = JSON.parse(event.data);
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { user_name: data.user_name, message: data.message },
-        ]);
-      });
+        ws.addEventListener("message", (event) => {
+          const data = JSON.parse(event.data);
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { user_name: data.user_name, message: data.message },
+          ]);
+        });
 
-      ws.addEventListener("error", (error) => {
-        console.error("WebSocket error:", error);
-      });
+        ws.addEventListener("error", (error) => {
+          console.error("WebSocket error:", error);
+        });
 
-      ws.addEventListener("close", () => {
-        console.log("WebSocket connection closed");
-      });
+        ws.addEventListener("close", () => {
+          console.log("WebSocket connection closed");
+        });
+      } catch (error) {
+        console.error("Error connecting to WebSocket:", error);
+      }
     };
 
-    handleJoinOrCreateChatroom();
-    handleGetMessageRequest();
-    connectWebSocket();
+    const initializeChat = async () => {
+      await connectWebSocket();
+      await handleGetMessageRequest();
+    };
 
-    window.addEventListener("beforeunload", handleLeaveChatroom);
+    initializeChat();
 
     return () => {
-      handleLeaveChatroom();
       if (socketRef.current) {
         socketRef.current.close();
       }
-      window.removeEventListener("beforeunload", handleLeaveChatroom);
     };
-  }, [roomName]);
+  }, [roomName, navigate]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(event.target.value);
